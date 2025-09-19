@@ -46,7 +46,7 @@ class CollectionInfo(BaseModel):
 class ChromaConfig(BaseModel):
     """ChromaDB configuration"""
     persist_directory: str = "./data/chroma_db"
-    collection_name: str = "commit_embeddings"
+    collection_name: str = "default"
     distance_metric: str = "cosine"
     hnsw_space: str = "cosine"
     hnsw_construction_ef: int = 200

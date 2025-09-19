@@ -58,7 +58,7 @@ def cli(log_level: str, log_file: str, config_check: bool):
 
 @cli.command()
 @click.option('--source', '-s', default=None, help='임베딩 데이터 소스 디렉토리 (env: MIGRATION_SOURCE_DIR)')
-@click.option('--collection', '-c', default=None, help='ChromaDB 컬렉션명 (env: CHROMA_COLLECTION_NAME)')
+@click.option('--collection', '-c', default='default', help='ChromaDB 컬렉션명 (기본값: default)')
 @click.option('--batch-size', default=None, help='배치 크기 (env: MIGRATION_BATCH_SIZE)')
 @click.option('--overwrite', is_flag=True, help='기존 컬렉션 덮어쓰기 (env: MIGRATION_OVERWRITE_EXISTING)')
 def migrate(source: str, collection: str, batch_size: int, overwrite: bool):
@@ -104,10 +104,14 @@ def migrate(source: str, collection: str, batch_size: int, overwrite: bool):
 
 @cli.command()
 @click.option('--query', '-q', required=True, help='검색 쿼리')
-@click.option('--collection', '-c', default=None, help='컬렉션명 (env: CHROMA_COLLECTION_NAME)')
+@click.option('--collection', '-c', default='default', help='컬렉션명 (기본값: default)')
 @click.option('--limit', default=10, help='결과 개수')
 @click.option('--filter', help='메타데이터 필터 (JSON 형식)')
-def search(query: str, collection: str, limit: int, filter: Optional[str]):
+@click.option('--hybrid', is_flag=True, help='하이브리드 검색 사용 (BM25 + 벡터)')
+@click.option('--bm25-weight', default=0.4, help='BM25 가중치 (0.0-1.0)')
+@click.option('--vector-weight', default=0.6, help='벡터 가중치 (0.0-1.0)')
+def search(query: str, collection: str, limit: int, filter: Optional[str], 
+          hybrid: bool, bm25_weight: float, vector_weight: float):
     """벡터 데이터베이스에서 검색"""
     print(f"🔍 검색 시작: '{query}'")
     
@@ -126,15 +130,24 @@ def search(query: str, collection: str, limit: int, filter: Optional[str]):
             import json
             where_filter = json.loads(filter)
         
-        # Create search query
-        search_query = SearchQuery(
-            query_text=query,
-            n_results=limit,
-            where=where_filter
-        )
-        
         # Perform search
-        results = service.search(collection, search_query)
+        if hybrid:
+            print(f"🔀 하이브리드 검색 모드 (BM25: {bm25_weight}, 벡터: {vector_weight})")
+            results = service.hybrid_search(
+                collection_name=collection,
+                query=query,
+                top_k=limit,
+                bm25_weight=bm25_weight,
+                vector_weight=vector_weight
+            )
+        else:
+            # Create search query for vector search
+            search_query = SearchQuery(
+                query_text=query,
+                n_results=limit,
+                where=where_filter
+            )
+            results = service.search(collection, search_query)
         
         print(f"✅ 검색 완료 ({results.query_time_ms:.2f}ms)")
         print(f"📊 결과: {len(results.ids)}개")
@@ -156,7 +169,7 @@ def search(query: str, collection: str, limit: int, filter: Optional[str]):
 
 
 @cli.command()
-@click.option('--collection', '-c', default=None, help='컬렉션명 (env: CHROMA_COLLECTION_NAME)')
+@click.option('--collection', '-c', default='default', help='컬렉션명 (기본값: default)')
 def info(collection: str):
     """컬렉션 정보 조회"""
     print(f"📋 컬렉션 정보 조회: {collection or 'default'}")

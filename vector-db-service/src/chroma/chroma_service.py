@@ -20,6 +20,7 @@ from ..models import (
     MonitoringMetrics
 )
 from ..utils.embedding_generator import EmbeddingGenerator
+from ..utils.hybrid_search import HybridSearchService
 
 
 class ChromaService:
@@ -40,6 +41,9 @@ class ChromaService:
         
         # Initialize embedding generator for text queries
         self.embedding_generator = EmbeddingGenerator()
+        
+        # Initialize hybrid search service
+        self.hybrid_search_service = HybridSearchService(config.persist_directory)
         
         self.logger.info("ChromaDB 서비스 초기화됨", extra={
             "persist_directory": config.persist_directory,
@@ -168,6 +172,107 @@ class ChromaService:
             query_time = (time.time() - start_time) * 1000
             self.logger.error("검색 실패", extra={
                 "collection_name": collection_name,
+                "error": str(error),
+                "query_time_ms": query_time
+            })
+            raise
+    
+    def hybrid_search(self, collection_name: str, query: str, top_k: int = 10, 
+                     bm25_weight: float = 0.4, vector_weight: float = 0.6) -> SearchResult:
+        """Perform hybrid search combining BM25 and vector search"""
+        start_time = time.time()
+        
+        try:
+            collection = self.client.get_collection(collection_name)
+            
+            # Set hybrid search weights
+            self.hybrid_search_service.set_weights(bm25_weight, vector_weight)
+            
+            # Get all documents and embeddings from collection
+            all_data = collection.get(include=["documents", "embeddings", "metadatas"])
+            
+            self.logger.info("컬렉션 데이터 로드 완료", extra={
+                "documents_count": len(all_data.get("documents", [])),
+                "embeddings_count": len(all_data.get("embeddings", [])),
+                "metadatas_count": len(all_data.get("metadatas", [])),
+                "ids_count": len(all_data.get("ids", []))
+            })
+            
+            if not all_data.get("documents") or len(all_data.get("embeddings", [])) == 0:
+                self.logger.warning("컬렉션에 문서나 임베딩이 없음", extra={
+                    "collection_name": collection_name
+                })
+                return SearchResult(
+                    ids=[],
+                    documents=[],
+                    metadatas=[],
+                    distances=[],
+                    query_time_ms=(time.time() - start_time) * 1000
+                )
+            
+            # Prepare data for hybrid search
+            documents = all_data["documents"]
+            # Convert numpy arrays to lists for hybrid search
+            embeddings = [embedding.tolist() if hasattr(embedding, 'tolist') else embedding for embedding in all_data["embeddings"]]
+            metadatas = all_data["metadatas"] or []
+            ids = all_data["ids"]
+            
+            # BM25 index will be built automatically in hybrid search if needed
+            
+            # Perform hybrid search
+            self.logger.info("하이브리드 검색 수행 시작")
+            hybrid_results = self.hybrid_search_service.search(
+                query=query,
+                documents=documents,
+                document_ids=ids,
+                embeddings=embeddings,
+                top_k=top_k
+            )
+            
+            # Format results
+            result_ids = []
+            result_documents = []
+            result_metadatas = []
+            result_distances = []
+            
+            for doc_id, combined_score, score_breakdown in hybrid_results:
+                # Find document index
+                try:
+                    doc_idx = ids.index(doc_id)
+                    result_ids.append(doc_id)
+                    result_documents.append(documents[doc_idx])
+                    result_metadatas.append(metadatas[doc_idx] if doc_idx < len(metadatas) else {})
+                    # Use combined score as distance (inverted for consistency with vector search)
+                    result_distances.append(1.0 - combined_score)
+                except ValueError:
+                    continue
+            
+            query_time = (time.time() - start_time) * 1000
+            
+            search_result = SearchResult(
+                ids=result_ids,
+                documents=result_documents,
+                metadatas=result_metadatas,
+                distances=result_distances,
+                query_time_ms=query_time
+            )
+            
+            self.logger.info("하이브리드 검색 완료", extra={
+                "collection_name": collection_name,
+                "query": query,
+                "results_count": len(result_ids),
+                "query_time_ms": query_time,
+                "bm25_weight": bm25_weight,
+                "vector_weight": vector_weight
+            })
+            
+            return search_result
+            
+        except Exception as error:
+            query_time = (time.time() - start_time) * 1000
+            self.logger.error("하이브리드 검색 실패", extra={
+                "collection_name": collection_name,
+                "query": query,
                 "error": str(error),
                 "query_time_ms": query_time
             })
