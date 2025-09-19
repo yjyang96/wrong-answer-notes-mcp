@@ -7,6 +7,7 @@ export interface ProcessedCommitData {
   author: string;
   date: Date;
   classification: ClassificationData;
+  environment?: EnvironmentInfo | null;
   metadata: ProcessedMetadata;
 }
 
@@ -18,6 +19,15 @@ export interface ClassificationData {
   error_type?: string;
   api_signature?: string;
   reasoning?: string;
+}
+
+export interface EnvironmentInfo {
+  languages?: string[] | null;
+  frameworks?: string[] | null;
+  build_systems?: string[] | null;
+  file_types?: string[] | null;
+  tools?: string[] | null;
+  versions?: Record<string, string> | null;
 }
 
 export interface ProcessedMetadata {

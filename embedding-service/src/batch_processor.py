@@ -153,7 +153,8 @@ class EmbeddingBatchProcessor:
                                 dimensions=response.dimensions,
                                 content_type=request.content_type,
                                 processing_time_ms=0,  # Will be calculated at batch level
-                                batch_id=chunk_id
+                                batch_id=chunk_id,
+                                environment=(request.metadata or {}).get("environment")
                             )
                         )
                         
@@ -221,7 +222,8 @@ class EmbeddingBatchProcessor:
                     "author": commit.author,
                     "date": commit.date.isoformat(),
                     "repository": commit.repository,
-                    "branch": commit.branch
+                    "branch": commit.branch,
+                    "environment": getattr(commit, "environment", None)
                 }
             )
             requests.append(request)
@@ -247,6 +249,27 @@ class EmbeddingBatchProcessor:
             parts.append(f"Error Type: {commit.classification['error_type']}")
         if commit.classification.get("api_signature"):
             parts.append(f"API Signature: {commit.classification['api_signature']}")
+        
+        # Add environment summary line
+        env = getattr(commit, "environment", None)
+        if env:
+            langs = ", ".join(env.get("languages") or []) if isinstance(env.get("languages"), list) else None
+            frms = ", ".join(env.get("frameworks") or []) if isinstance(env.get("frameworks"), list) else None
+            builds = ", ".join(env.get("build_systems") or []) if isinstance(env.get("build_systems"), list) else None
+            ftypes = ", ".join(env.get("file_types") or []) if isinstance(env.get("file_types"), list) else None
+            tools = ", ".join(env.get("tools") or []) if isinstance(env.get("tools"), list) else None
+            vers = None
+            if isinstance(env.get("versions"), dict) and env.get("versions"):
+                vers = ", ".join([f"{k}={v}" for k, v in env["versions"].items()])
+            summary_parts = []
+            if langs: summary_parts.append(f"Languages: {langs}")
+            if frms: summary_parts.append(f"Frameworks: {frms}")
+            if builds: summary_parts.append(f"Build: {builds}")
+            if tools: summary_parts.append(f"Tools: {tools}")
+            if vers: summary_parts.append(f"Versions: {vers}")
+            if ftypes: summary_parts.append(f"FileTypes: {ftypes}")
+            if summary_parts:
+                parts.append("Environment: " + " | ".join(summary_parts))
         
         return "\n".join(parts)
     

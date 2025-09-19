@@ -54,6 +54,26 @@ export class PreprocessingService {
       const processedCommits = this.extractStructuredFields(filteredCommits, classifications);
       console.log(`   → Extracted fields for ${processedCommits.length} commits`);
 
+      // Stage 3.5: Environment information extraction (separate LLM pass)
+      console.log('🌐 Stage 3.5: Extracting environment information from diff via LLM...');
+      this.logger.info('Stage 3.5: Extracting environment information');
+      try {
+        const envRequests = filteredCommits.map(commit => ({
+          commit_message: commit.message,
+          diff_summary: this.createDiffSummary(commit.diff),
+          file_changes: commit.files.map(f => f.path)
+        }));
+        const envInfos = await this.llmService.batchExtractEnvironment(envRequests);
+        for (let i = 0; i < processedCommits.length; i++) {
+          processedCommits[i].environment = envInfos[i] ?? null;
+        }
+      } catch (e) {
+        this.logger.warn(`Environment extraction failed, continuing without it: ${e}`);
+        for (let i = 0; i < processedCommits.length; i++) {
+          processedCommits[i].environment = null;
+        }
+      }
+
       // Stage 4: Filter relevant commits (exclude "other" category)
       console.log('🎯 Stage 4: Filtering relevant commits for wrong answer notes...');
       this.logger.info('Stage 4: Filtering relevant commits');

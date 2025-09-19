@@ -1,14 +1,28 @@
 #!/usr/bin/env node
 
 import * as dotenv from 'dotenv';
-dotenv.config();
+import * as path from 'path';
+import * as fsSync from 'fs';
+
+// Load environment variables once from the first existing candidate
+(() => {
+  const candidates = [
+    path.resolve(process.cwd(), '.env'),
+    path.resolve(__dirname, '../../.env')
+  ];
+  for (const envPath of candidates) {
+    if (fsSync.existsSync(envPath)) {
+      dotenv.config({ path: envPath });
+      break;
+    }
+  }
+})();
 
 import { Command } from 'commander';
 import { PreprocessingService } from '../services/preprocessing';
 import { CommitData } from '../models/commit';
 import { Logger } from '../utils/logger';
 import * as fs from 'fs/promises';
-import * as path from 'path';
 
 const program = new Command();
 const logger = new Logger('PreprocessingCLI');

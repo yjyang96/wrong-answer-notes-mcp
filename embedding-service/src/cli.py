@@ -25,13 +25,15 @@ def cli(log_level: str, log_file: str):
     """임베딩 서비스 CLI"""
     # 로그 설정
     logger.remove()
-    logger.add(
+    # Ensure 'context' always exists to avoid KeyError in format
+    safe_logger = logger.patch(lambda r: r["extra"].setdefault("context", "-"))
+    safe_logger.add(
         log_file,
         level=log_level,
-        format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {context} | {message}",
+        format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {extra[context]} | {message}",
         rotation="10 MB"
     )
-    logger.add(
+    safe_logger.add(
         lambda msg: print(msg, end=""),
         level=log_level,
         format="<green>{time:HH:mm:ss}</green> | <level>{level}</level> | {message}"

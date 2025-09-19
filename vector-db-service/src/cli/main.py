@@ -107,7 +107,7 @@ def migrate(source: str, collection: str, batch_size: int, overwrite: bool):
 @click.option('--collection', '-c', default='default', help='컬렉션명 (기본값: default)')
 @click.option('--limit', default=10, help='결과 개수')
 @click.option('--filter', help='메타데이터 필터 (JSON 형식)')
-@click.option('--hybrid', is_flag=True, help='하이브리드 검색 사용 (BM25 + 벡터)')
+@click.option('--hybrid/--no-hybrid', default=True, help='하이브리드 검색 사용 (BM25 + 벡터). 기본값: 하이브리드 ON')
 @click.option('--bm25-weight', default=0.4, help='BM25 가중치 (0.0-1.0)')
 @click.option('--vector-weight', default=0.6, help='벡터 가중치 (0.0-1.0)')
 def search(query: str, collection: str, limit: int, filter: Optional[str], 

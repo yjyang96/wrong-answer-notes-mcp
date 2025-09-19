@@ -43,6 +43,7 @@ class EmbeddingMetadata(BaseModel):
     content_type: Literal["text", "code", "mixed"]
     processing_time_ms: int
     batch_id: Optional[str] = None
+    environment: Optional[Dict[str, Any]] = None
 
 
 class BatchEmbeddingRequest(BaseModel):
@@ -99,6 +100,7 @@ class ProcessedCommitData(BaseModel):
     author: str
     date: datetime
     classification: Dict[str, Any]
+    environment: Optional[Dict[str, Any]] = None
     metadata: Dict[str, Any]
 
 

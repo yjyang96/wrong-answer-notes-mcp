@@ -1,5 +1,5 @@
 import { Logger } from '../utils/logger';
-import { LLMClassificationRequest, LLMClassificationResponse } from '../models/processed-commit';
+import { LLMClassificationRequest, LLMClassificationResponse, EnvironmentInfo } from '../models/processed-commit';
 
 export class AzureOpenAIService {
   private logger: Logger;
@@ -17,6 +17,71 @@ export class AzureOpenAIService {
 
     if (!this.apiKey) {
       this.logger.warn('Azure OpenAI API key not found in environment variables');
+    }
+  }
+
+  /** Build environment-only extraction prompt */
+  private buildEnvironmentPrompt(request: LLMClassificationRequest): string {
+    return `You are extracting ONLY environment information from a Git commit. Do NOT classify. Do NOT guess. If not explicitly present, use null or empty arrays.
+
+Commit Message: ${request.commit_message}
+File Changes: ${request.file_changes.join(', ')}
+Diff Summary: ${request.diff_summary}
+
+Return JSON with a single field "environment_info":
+{
+  "environment_info": {
+    "languages": string[] | null,
+    "frameworks": string[] | null,
+    "build_systems": string[] | null,
+    "file_types": string[] | null,
+    "tools": string[] | null,
+    "versions": { [name: string]: string } | null
+  }
+}
+
+Rules:
+- Extract languages ONLY from explicit file extensions (.py, .cc, .js, etc.).
+- Frameworks ONLY from explicit imports/includes/dependency refs.
+- Build systems ONLY from file names like BUILD, CMakeLists.txt, package.json, WORKSPACE, Bazel rc.
+- Versions ONLY if explicitly mentioned (e.g., "v2.5.0", "upgrade to 1.4.2").
+- Tools ONLY if explicitly named with optional versions (e.g., gcc 9.3, clang-12, bazel 4.0).
+- If missing, set the field to null (not omitted).`;
+  }
+
+  /** Extract environment info for one commit */
+  public async extractEnvironmentInfo(request: LLMClassificationRequest): Promise<EnvironmentInfo | null> {
+    if (!this.apiKey) throw new Error('Azure OpenAI API key is not configured');
+    const prompt = this.buildEnvironmentPrompt(request);
+    const response = await this.callOpenAIAPI(prompt);
+    return this.parseEnvironmentResponse(response);
+  }
+
+  /** Batch extract environment info */
+  public async batchExtractEnvironment(requests: LLMClassificationRequest[]): Promise<(EnvironmentInfo | null)[]> {
+    const results: (EnvironmentInfo | null)[] = [];
+    for (const req of requests) {
+      try {
+        const info = await this.extractEnvironmentInfo(req);
+        results.push(info);
+      } catch {
+        results.push(null);
+      }
+    }
+    return results;
+  }
+
+  /** Parse environment-only response */
+  private parseEnvironmentResponse(response: string): EnvironmentInfo | null {
+    try {
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) return null;
+      const parsed = JSON.parse(jsonMatch[0]);
+      const env = parsed.environment_info;
+      if (typeof env === 'object' && env !== null) return env as EnvironmentInfo;
+      return null;
+    } catch {
+      return null;
     }
   }
 
