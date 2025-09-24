@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vector-db-service"
+version = "1.0.0"
+description = "ChromaDB vector database service for commit embeddings"
+authors = [{name = "Dev Agent", email = "dev@example.com"}]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "chromadb>=0.4.0",
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "pydantic>=2.5.0",
+    "python-dotenv>=1.0.0",
+    "click>=8.1.0",
+    "loguru>=0.7.0",
+    "tqdm>=4.66.0",
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "black>=23.11.0",
+]
+
+[project.scripts]
+vector-db-cli = "src.cli.main:cli"
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

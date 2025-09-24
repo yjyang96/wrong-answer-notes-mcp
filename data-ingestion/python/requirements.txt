@@ -1,0 +1,5 @@
+pydriller==2.5.0
+gitpython==3.1.40
+requests==2.31.0
+python-dotenv==1.0.0
+

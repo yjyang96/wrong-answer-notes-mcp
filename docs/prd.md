@@ -147,11 +147,11 @@ KT 클라우드의 기업 아이덴티티를 반영하되, 개발자 친화적�
 
 ## Epic List
 
-**Epic 1: Foundation & Core Infrastructure**
-프로젝트 기반 구조를 구축하고 핵심 인프라를 설정하여 MCP 서버의 기본 동작을 보장합니다.
-
-**Epic 2: Data Collection & Processing**
+**Epic 1: Data Collection & Processing**
 Git 커밋 데이터 수집, 전처리, 임베딩 생성 및 저장소 구축을 통해 오답노트 데이터베이스를 구축합니다.
+
+**Epic 2: Foundation & Core Infrastructure**
+프로젝트 기반 구조를 구축하고 핵심 인프라를 설정하여 MCP 서버의 기본 동작을 보장합니다.
 
 **Epic 3: Search & Retrieval Engine**
 하이브리드 검색 시스템을 구현하여 개발자 질의에 대한 관련 커밋 사례를 효율적으로 검색합니다.
@@ -165,63 +165,11 @@ Model Context Protocol 서버를 구현하고 Cursor/VSCode 등 IDE와의 통합
 **Epic 6: Monitoring & Operations**
 시스템 모니터링, 로깅, 성능 추적 및 운영 도구를 구축하여 서비스 안정성을 확보합니다.
 
-## Epic 1: Foundation & Core Infrastructure
-
-프로젝트 기반 구조를 구축하고 핵심 인프라를 설정하여 MCP 서버의 기본 동작을 보장합니다. 이 Epic은 전체 시스템의 기반이 되는 인프라와 기본 서비스를 구축하여 후속 Epic들이 안정적으로 개발될 수 있는 환경을 제공합니다.
-
-### Story 1.1: Project Setup & Repository Structure
-As a **developer**,
-I want **a well-structured monorepo with proper configuration**,
-so that **I can efficiently develop and maintain the MCP server components**.
-
-#### Acceptance Criteria
-1. Monorepo 구조가 설정되어 MCP 서버, 데이터 수집 서비스, 임베딩 서비스 등이 적절히 분리되어 있습니다.
-2. TypeScript, Node.js 개발 환경이 구성되어 있습니다.
-3. ESLint, Prettier, Husky 등 코드 품질 도구가 설정되어 있습니다.
-4. package.json과 의존성 관리가 각 서비스별로 구성되어 있습니다.
-5. README.md와 개발 가이드가 작성되어 있습니다.
-
-### Story 1.2: Azure Cloud Infrastructure Setup
-As a **system administrator**,
-I want **Azure 클라우드 인프라가 구성**,
-so that **MCP 서버가 안정적으로 운영될 수 있습니다**.
-
-#### Acceptance Criteria
-1. Azure 리소스 그룹과 기본 네트워킹이 구성되어 있습니다.
-2. Azure Key Vault가 설정되어 시크릿 관리가 가능합니다.
-3. Azure Container Registry가 구성되어 이미지 저장이 가능합니다.
-4. Application Insights가 설정되어 모니터링이 가능합니다.
-5. Managed Identity가 구성되어 보안 인증이 가능합니다.
-
-### Story 1.3: CI/CD Pipeline Foundation
-As a **developer**,
-I want **GitHub Actions 기반 CI/CD 파이프라인**,
-so that **코드 변경사항이 자동으로 빌드, 테스트, 배포됩니다**.
-
-#### Acceptance Criteria
-1. GitHub Actions 워크플로우가 설정되어 있습니다.
-2. 코드 커밋 시 자동 빌드와 테스트가 실행됩니다.
-3. Docker 이미지 빌드 및 ACR 푸시가 자동화되어 있습니다.
-4. 멀티태깅(sha, branch, latest)이 지원됩니다.
-5. 배포 승인 프로세스가 구현되어 있습니다.
-
-### Story 1.4: Basic MCP Server Framework
-As a **developer**,
-I want **기본 MCP 서버 프레임워크**,
-so that **IDE와의 기본 통신이 가능합니다**.
-
-#### Acceptance Criteria
-1. Model Context Protocol 서버의 기본 구조가 구현되어 있습니다.
-2. Cursor/VSCode와의 기본 연결이 가능합니다.
-3. 간단한 헬스체크 엔드포인트가 구현되어 있습니다.
-4. 로깅 시스템이 기본적으로 구성되어 있습니다.
-5. 에러 핸들링이 기본적으로 구현되어 있습니다.
-
-## Epic 2: Data Collection & Processing
+## Epic 1: Data Collection & Processing
 
 Git 커밋 데이터 수집, 전처리, 임베딩 생성 및 저장소 구축을 통해 오답노트 데이터베이스를 구축합니다. 이 Epic은 기획문서의 핵심 기능인 "오답노트 (데이터 수집·전처리)"를 구현하여 시스템의 지식베이스 기반을 마련합니다.
 
-### Story 2.1: Git Commit Data Collection Service
+### Story 1.1: Git Commit Data Collection Service
 As a **data engineer**,
 I want **Git 커밋 메시지와 Diff를 자동으로 수집하는 서비스**,
 so that **오답노트 데이터베이스의 원시 데이터를 확보할 수 있습니다**.
@@ -233,7 +181,7 @@ so that **오답노트 데이터베이스의 원시 데이터를 확보할 수 �
 4. 모든 브랜치의 커밋 데이터를 수집할 수 있습니다.
 5. 수집된 데이터의 메타데이터(저장소, 브랜치, 날짜 등)가 보존됩니다.
 
-### Story 2.2: Commit Data Preprocessing & Labeling
+### Story 1.2: Commit Data Preprocessing & Labeling
 As a **data engineer**,
 I want **커밋 데이터를 전처리하고 라벨링하는 시스템**,
 so that **검색 정밀도를 높일 수 있는 구조화된 데이터를 생성할 수 있습니다**.
@@ -245,7 +193,7 @@ so that **검색 정밀도를 높일 수 있는 구조화된 데이터를 생성
 4. JSON 형태로 구조화된 데이터가 생성됩니다.
 5. 전처리 과정의 품질 검증 메커니즘이 구현되어 있습니다.
 
-### Story 2.3: Text Embedding Generation
+### Story 1.3: Text Embedding Generation
 As a **data engineer**,
 I want **커밋 메시지와 Diff를 임베딩으로 변환하는 서비스**,
 so that **벡터 검색이 가능한 형태로 데이터를 저장할 수 있습니다**.
@@ -257,7 +205,7 @@ so that **벡터 검색이 가능한 형태로 데이터를 저장할 수 있습
 4. 임베딩 메타데이터가 원본 커밋과 연결되어 저장됩니다.
 5. 임베딩 품질 검증 메커니즘이 구현되어 있습니다.
 
-### Story 2.4: Vector Database Setup & Storage
+### Story 1.4: Vector Database Setup & Storage
 As a **data engineer**,
 I want **벡터 데이터베이스에 임베딩을 저장하는 시스템**,
 so that **효율적인 벡터 검색이 가능합니다**.
@@ -268,6 +216,58 @@ so that **효율적인 벡터 검색이 가능합니다**.
 3. 임베딩과 메타데이터가 효율적으로 저장됩니다.
 4. 데이터 백업 및 복구 메커니즘이 구현되어 있습니다.
 5. 저장소 성능 모니터링이 설정되어 있습니다.
+
+## Epic 2: Foundation & Core Infrastructure
+
+프로젝트 기반 구조를 구축하고 핵심 인프라를 설정하여 MCP 서버의 기본 동작을 보장합니다. 이 Epic은 전체 시스템의 기반이 되는 인프라와 기본 서비스를 구축하여 후속 Epic들이 안정적으로 개발될 수 있는 환경을 제공합니다.
+
+### Story 2.1: Project Setup & Repository Structure
+As a **developer**,
+I want **a well-structured monorepo with proper configuration**,
+so that **I can efficiently develop and maintain the MCP server components**.
+
+#### Acceptance Criteria
+1. Monorepo 구조가 설정되어 MCP 서버, 데이터 수집 서비스, 임베딩 서비스 등이 적절히 분리되어 있습니다.
+2. TypeScript, Node.js 개발 환경이 구성되어 있습니다.
+3. ESLint, Prettier, Husky 등 코드 품질 도구가 설정되어 있습니다.
+4. package.json과 의존성 관리가 각 서비스별로 구성되어 있습니다.
+5. README.md와 개발 가이드가 작성되어 있습니다.
+
+### Story 2.2: Azure Cloud Infrastructure Setup
+As a **system administrator**,
+I want **Azure 클라우드 인프라가 구성**,
+so that **MCP 서버가 안정적으로 운영될 수 있습니다**.
+
+#### Acceptance Criteria
+1. Azure 리소스 그룹과 기본 네트워킹이 구성되어 있습니다.
+2. Azure Key Vault가 설정되어 시크릿 관리가 가능합니다.
+3. Azure Container Registry가 구성되어 이미지 저장이 가능합니다.
+4. Application Insights가 설정되어 모니터링이 가능합니다.
+5. Managed Identity가 구성되어 보안 인증이 가능합니다.
+
+### Story 2.3: CI/CD Pipeline Foundation
+As a **developer**,
+I want **GitHub Actions 기반 CI/CD 파이프라인**,
+so that **코드 변경사항이 자동으로 빌드, 테스트, 배포됩니다**.
+
+#### Acceptance Criteria
+1. GitHub Actions 워크플로우가 설정되어 있습니다.
+2. 코드 커밋 시 자동 빌드와 테스트가 실행됩니다.
+3. Docker 이미지 빌드 및 ACR 푸시가 자동화되어 있습니다.
+4. 멀티태깅(sha, branch, latest)이 지원됩니다.
+5. 배포 승인 프로세스가 구현되어 있습니다.
+
+### Story 2.4: Basic MCP Server Framework
+As a **developer**,
+I want **기본 MCP 서버 프레임워크**,
+so that **IDE와의 기본 통신이 가능합니다**.
+
+#### Acceptance Criteria
+1. Model Context Protocol 서버의 기본 구조가 구현되어 있습니다.
+2. Cursor/VSCode와의 기본 연결이 가능합니다.
+3. 간단한 헬스체크 엔드포인트가 구현되어 있습니다.
+4. 로깅 시스템이 기본적으로 구성되어 있습니다.
+5. 에러 핸들링이 기본적으로 구현되어 있습니다.
 
 ## Epic 3: Search & Retrieval Engine
 
@@ -608,4 +608,3 @@ so that **서비스가 안정적으로 운영됩니다**.
 ---
 
 **전체적으로 기획문서는 매우 잘 작성되어 있으며, 핵심 아이디어와 기술적 접근 방식이 명확합니다. 위의 보완점들을 추가하면 더욱 완성도 높은 프로젝트가 될 것입니다.**
-
