@@ -80,7 +80,7 @@ class Story2Runner:
             return False
         
         # Python 확인
-        if not self.run_command("python --version", description="Python 확인"):
+        if not self.run_command("python3 --version", description="Python 확인"):
             print("❌ Python이 설치되지 않았습니다.")
             return False
         
