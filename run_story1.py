@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Story 2 통합 실행 스크립트
-- Story 2.1: Git Commit Data Collection
-- Story 2.2: Commit Data Preprocessing & Labeling  
-- Story 2.3: Text Embedding Generation
-- Story 2.4: Vector Database Setup & Storage
+Story 1 통합 실행 스크립트
+- Story 1.1: Git Commit Data Collection
+- Story 1.2: Commit Data Preprocessing & Labeling  
+- Story 1.3: Text Embedding Generation
+- Story 1.4: Vector Database Setup & Storage
 
-사용법: python run_story2.py <repository> <max_commits>
-예시: python run_story2.py tensorflow/tensorflow 100
+사용법: python run_story1.py <repository> <max_commits>
+예시: python run_story1.py tensorflow/tensorflow 100
 """
 
 import os
@@ -20,8 +20,8 @@ from typing import Dict, Any, Optional
 import argparse
 
 
-class Story2Runner:
-    """Story 2 전체 파이프라인 실행기"""
+class Story1Runner:
+    """Story 1 전체 파이프라인 실행기"""
     
     def __init__(self, repository: str, max_commits: int):
         self.repository = repository
@@ -38,7 +38,7 @@ class Story2Runner:
         self.processed_commits_file = self.output_dir / f"processed_{repository.replace('/', '_')}_commits.json"
         self.embeddings_dir = self.output_dir / "embeddings"
         
-        print(f"🚀 Story 2 파이프라인 시작")
+        print(f"🚀 Story 1 파이프라인 시작")
         print(f"📦 저장소: {repository}")
         print(f"📊 최대 커밋 수: {max_commits}")
         print(f"📁 출력 디렉토리: {self.output_dir}")
@@ -106,9 +106,9 @@ class Story2Runner:
         print("✅ 환경 설정 확인 완료")
         return True
     
-    def story_2_1_data_collection(self) -> bool:
-        """Story 2.1: Git Commit Data Collection"""
-        print(f"\n📥 Story 2.1: Git Commit Data Collection")
+    def story_1_1_data_collection(self) -> bool:
+        """Story 1.1: Git Commit Data Collection"""
+        print(f"\n📥 Story 1.1: Git Commit Data Collection")
         print("-" * 40)
         
         # data-ingestion 디렉토리로 이동
@@ -136,9 +136,9 @@ class Story2Runner:
         print(f"✅ {len(commits)}개 커밋 수집 완료")
         return True
     
-    def story_2_2_preprocessing(self) -> bool:
-        """Story 2.2: Commit Data Preprocessing & Labeling"""
-        print(f"\n🔄 Story 2.2: Commit Data Preprocessing & Labeling")
+    def story_1_2_preprocessing(self) -> bool:
+        """Story 1.2: Commit Data Preprocessing & Labeling"""
+        print(f"\n🔄 Story 1.2: Commit Data Preprocessing & Labeling")
         print("-" * 40)
         
         # data-ingestion 디렉토리로 이동
@@ -162,9 +162,9 @@ class Story2Runner:
         print(f"✅ {len(processed_commits)}개 커밋 전처리 완료")
         return True
     
-    def story_2_3_embedding(self) -> bool:
-        """Story 2.3: Text Embedding Generation"""
-        print(f"\n🧠 Story 2.3: Text Embedding Generation")
+    def story_1_3_embedding(self) -> bool:
+        """Story 1.3: Text Embedding Generation"""
+        print(f"\n🧠 Story 1.3: Text Embedding Generation")
         print("-" * 40)
         
         # embedding-service 디렉토리로 이동
@@ -187,9 +187,9 @@ class Story2Runner:
         print(f"✅ {len(embedding_files)}개 임베딩 생성 완료")
         return True
     
-    def story_2_4_vector_db(self) -> bool:
-        """Story 2.4: Vector Database Setup & Storage"""
-        print(f"\n🗄️ Story 2.4: Vector Database Setup & Storage")
+    def story_1_4_vector_db(self) -> bool:
+        """Story 1.4: Vector Database Setup & Storage"""
+        print(f"\n🗄️ Story 1.4: Vector Database Setup & Storage")
         print("-" * 40)
         
         # vector-db-service 디렉토리로 이동
@@ -217,7 +217,7 @@ class Story2Runner:
     
     def generate_summary(self) -> None:
         """실행 결과 요약 생성"""
-        print(f"\n📊 Story 2 실행 결과 요약")
+        print(f"\n📊 Story 1 실행 결과 요약")
         print("=" * 60)
         
         summary = {
@@ -257,7 +257,7 @@ class Story2Runner:
             pass
         
         # 요약 파일 저장
-        summary_file = self.output_dir / f"story2_summary_{self.timestamp}.json"
+        summary_file = self.output_dir / f"story1_summary_{self.timestamp}.json"
         with open(summary_file, 'w') as f:
             json.dump(summary, f, indent=2, ensure_ascii=False)
         
@@ -266,7 +266,7 @@ class Story2Runner:
         for key, value in summary["statistics"].items():
             print(f"   - {key}: {value}")
         
-        print(f"\n🎉 Story 2 파이프라인 완료!")
+        print(f"\n🎉 Story 1 파이프라인 완료!")
         print(f"🔍 검색 테스트: cd vector-db-service && source venv/bin/activate && python -m src.main search --query 'your query' --hybrid")
     
     def run(self) -> bool:
@@ -278,20 +278,20 @@ class Story2Runner:
             if not self.check_environment():
                 return False
             
-            # Story 2.1: 데이터 수집
-            if not self.story_2_1_data_collection():
+            # Story 1.1: 데이터 수집
+            if not self.story_1_1_data_collection():
                 return False
             
-            # Story 2.2: 전처리
-            if not self.story_2_2_preprocessing():
+            # Story 1.2: 전처리
+            if not self.story_1_2_preprocessing():
                 return False
             
-            # Story 2.3: 임베딩 생성
-            if not self.story_2_3_embedding():
+            # Story 1.3: 임베딩 생성
+            if not self.story_1_3_embedding():
                 return False
             
-            # Story 2.4: 벡터 DB 구축
-            if not self.story_2_4_vector_db():
+            # Story 1.4: 벡터 DB 구축
+            if not self.story_1_4_vector_db():
                 return False
             
             # 결과 요약
@@ -312,7 +312,7 @@ class Story2Runner:
 
 def main():
     """메인 함수"""
-    parser = argparse.ArgumentParser(description="Story 2 통합 실행 스크립트")
+    parser = argparse.ArgumentParser(description="Story 1 통합 실행 스크립트")
     parser.add_argument("repository", help="GitHub 저장소 (예: tensorflow/tensorflow)")
     parser.add_argument("max_commits", type=int, help="수집할 최대 커밋 수")
     
@@ -323,8 +323,8 @@ def main():
         print("❌ 저장소 형식이 올바르지 않습니다. 'owner/repo' 형식을 사용하세요.")
         sys.exit(1)
     
-    # Story 2 실행
-    runner = Story2Runner(args.repository, args.max_commits)
+    # Story 1 실행
+    runner = Story1Runner(args.repository, args.max_commits)
     success = runner.run()
     
     sys.exit(0 if success else 1)

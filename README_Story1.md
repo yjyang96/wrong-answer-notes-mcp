@@ -1,15 +1,15 @@
-# Story 2 통합 실행 가이드
+# Story 1 통합 실행 가이드
 
-## 🚀 Story 2 전체 파이프라인 자동 실행
+## 🚀 Story 1 전체 파이프라인 자동 실행
 
-Story 2의 모든 단계를 한 번에 실행할 수 있는 통합 스크립트입니다.
+Story 1의 모든 단계를 한 번에 실행할 수 있는 통합 스크립트입니다.
 
 ### 📋 포함된 스토리들
 
-- **Story 2.1**: Git Commit Data Collection (GitHub API)
-- **Story 2.2**: Commit Data Preprocessing & Labeling (LLM 분류)
-- **Story 2.3**: Text Embedding Generation (Azure OpenAI)
-- **Story 2.4**: Vector Database Setup & Storage (ChromaDB + BM25)
+- **Story 1.1**: Git Commit Data Collection (GitHub API)
+- **Story 1.2**: Commit Data Preprocessing & Labeling (LLM 분류)
+- **Story 1.3**: Text Embedding Generation (Azure OpenAI)
+- **Story 1.4**: Vector Database Setup & Storage (ChromaDB + BM25)
 
 ### 🛠️ 사전 준비
 
@@ -43,12 +43,12 @@ Story 2의 모든 단계를 한 번에 실행할 수 있는 통합 스크립트�
 
 ```bash
 # 기본 사용법
-python run_story2.py <repository> <max_commits>
+python run_story1.py <repository> <max_commits>
 
 # 예시
-python run_story2.py tensorflow/tensorflow 100
-python run_story2.py microsoft/vscode 50
-python run_story2.py facebook/react 200
+python run_story1.py tensorflow/tensorflow 100
+python run_story1.py microsoft/vscode 50
+python run_story1.py facebook/react 200
 ```
 
 ### 📊 실행 과정
@@ -68,7 +68,7 @@ output/
 ├── embeddings/                            # 임베딩 파일들
 │   ├── emb_*.json
 │   └── index.json
-└── story2_summary_<timestamp>.json        # 실행 결과 요약
+└── story1_summary_<timestamp>.json        # 실행 결과 요약
 ```
 
 ### 🔍 검색 테스트
@@ -131,7 +131,7 @@ python -m src.main search --query "test query" --collection "custom_collection" 
 
 ### 🎉 완료 후
 
-Story 2 파이프라인이 완료되면:
+Story 1 파이프라인이 완료되면:
 - ✅ ChromaDB에 벡터 데이터 저장
 - ✅ BM25 텍스트 검색 인덱스 구축
 - ✅ 하이브리드 검색 시스템 준비
